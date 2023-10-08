@@ -1,0 +1,205 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{% block title %}Frais{% endblock %}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'budgettrack/styles.css' %}">
+    <link rel="icon" type="image/jpg" href="/budget/budgettrack/img/Logo.jpg">
+    <style>
+        .container{
+            padding: 100px;
+        }      
+        /* Inline CSS for the sidebar */
+        .sidebar {
+            height: 100%;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: -250px;
+            background-color: #333;
+            color: #fff;
+            transition: 0.3s;
+            overflow-y: auto;
+        }
+        .sidebar.active {
+            left: 0;
+        }
+        .sidebar h2 {
+            padding: 20px 15px;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar ul li {
+            padding: 10px 15px;
+            border-bottom: 1px solid #555;
+        }
+        .sidebar ul li a {
+            color: #fff;
+            text-decoration: none;
+            display: block;
+        }
+        .sidebar ul li a:hover {
+            background-color: #444;
+        }
+        /* Button to open/close the sidebar */
+        .openbtn {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            padding: 10px 15px;
+            margin: 20px;
+            border-radius: 5px;
+            transition: 0.3s;
+            position: fixed;
+        }
+        .openbtn:hover {
+            background-color: #444;
+        }
+        .openbtn.active {
+            left: 250px;
+        }
+        {%block style%}{%endblock%}
+    </style>
+</head>
+<body>
+    <a class="openbtn" id="openBtn" href="{%url 'logout'%}">
+        Logout
+    </a>
+
+    <div id='body'>
+    {% block body %}{% endblock %}
+    </div>
+
+    <script>
+        function toggleCustomSidebar(type) {
+            var sidebar = document.getElementById("customSidebar");
+            var sidebarTitle = document.getElementById("sidebarTitle");
+            var entryType = document.getElementById("entryType");
+            var additionalFields = document.getElementById("additionalFields");
+            additionalFields.innerHTML = ""; // Clear previous additional fields
+
+            if (sidebar.classList.contains("active")) {
+                sidebar.classList.remove("active");
+            } else {
+                sidebar.classList.add("active");
+            }
+
+            switch (type) {
+                case 'account':
+                    sidebarTitle.innerText = 'Add New Account';
+                    entryType.value = 'account';
+                    // Additional fields for account
+                    additionalFields.innerHTML = `
+                        <div class="form-group">
+                            <label for="accountName">Account Name:</label>
+                            <input type="text" id="accountName" name="accountName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="originalAmount">Original Amount:</label>
+                            <input type="number" id="originalAmount" name="originalAmount" required>
+                        </div>
+                    `;
+                    break;
+                case 'expense':
+                    sidebarTitle.innerText = 'Add New Expense';
+                    entryType.value = 'expense';
+                    // Additional fields for expense
+                    additionalFields.innerHTML = `
+                        <div class="form-group">
+                            <label for="title">Title:</label>
+                            <input type="text" id="title" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="account">Account:</label>
+                            <select id="account" name="account" required>
+                                {%for account in accounts%}
+                                <option value={{account.account_name}}>{{account.account_name}}</option>
+                                {%endfor%}
+                                <!-- Add more account options here -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="amount">Amount:</label>
+                            <input type="number" id="amount" name="amount" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="entryDescription">Description:</label>
+                            <textarea id="entryDescription" name="entryDescription" rows="4"></textarea>
+                        </div>
+                    `;
+                    break;
+                case 'income':
+                    sidebarTitle.innerText = 'Add New Income';
+                    entryType.value = 'income';
+                    // Additional fields for income
+                    additionalFields.innerHTML = `
+                        <div class="form-group">
+                            <label for="title">Title:</label>
+                            <input type="text" id="title" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="account">Account:</label>
+                            <select id="account" name="account" required>
+                                {%for account in accounts%}
+                                <option value={{account.account_name}}>{{account.account_name}}</option>
+                                {%endfor%}
+                                <!-- Add more account options here -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="amount">Amount:</label>
+                            <input type="number" id="amount" name="amount" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="entryDescription">Description:</label>
+                            <textarea id="entryDescription" name="entryDescription" rows="4"></textarea>
+                        </div>
+                    `;
+                    break;
+                case 'transaction':
+                    sidebarTitle.innerText = 'Add New Transaction';
+                    entryType.value = 'transaction';
+                    // Additional fields for transaction
+                    additionalFields.innerHTML = `
+                        <div class="form-group">
+                            <label for="title">Title:</label>
+                            <input type="text" id="title" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="fromAccount">From Account:</label>
+                            <select id="fromAccount" name="fromAccount" required>
+                                {%for account in accounts%}
+                                <option value={{account.account_name}}>{{account.account_name}}</option>
+                                {%endfor%}
+                                <!-- Add more account options here -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="toAccount">To Account:</label>
+                            <select id="toAccount" name="toAccount" required>
+                                {%for account in accounts%}
+                                <option value={{account.account_name}}>{{account.account_name}}</option>
+                                {%endfor%}
+                                <!-- Add more account options here -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="amount">Amount:</label>
+                            <input type="number" id="amount" name="amount" required>
+                        </div>
+                    `;
+                    break;
+                default:
+                    break;
+            }
+        }
+    </script>
+    {%block scrpit%} {%endblock%}
+</body>
+</html>

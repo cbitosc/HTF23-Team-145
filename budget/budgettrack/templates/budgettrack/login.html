@@ -1,0 +1,85 @@
+{% extends "budgettrack/layout.html" %}
+
+
+{%block style%}
+*, body{
+    background-color: #2b2e2b;
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; 
+}
+
+div{
+    padding: 15px;
+    margin: 20px;
+    font-size: 20px;
+}
+
+h1 {
+    border-radius: 10px;
+    margin: 30px;
+    padding: 26px;
+    font-weight: 2000;
+    font-size: 1.5cm;
+}
+
+p {
+    font-size: 20px;
+    font-weight: bolder;
+}
+
+button {
+    background-color: #677269;
+    padding: 15px;
+    font-weight: bold;
+    border-radius: 10px;
+    width: 200px;
+    font-size: 17px;
+}
+
+input[type=text],
+input[type=password], input[type=email] {
+    padding: 12px;
+    margin: 8px;
+    display: inline-block;
+    border: 1px solid rgb(138, 216, 177);
+    box-sizing: border-box;
+    background-color: #575f59;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-weight: bold;
+    width: 300px;
+}
+
+input[type=Submit], input[type=date] {
+    padding: 15px;
+    font-weight: bolder;
+    border-radius: 10px;
+    width: 100px;
+    font-size: 24px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: #677269;
+}
+{%endblock%}
+
+{%block body%}
+<center>
+<div class="container">    
+    <h1>Login</h1>
+    {% if message %}
+    <div>{{ message }}</div>
+    {% endif %}
+    <form action="{%url 'login'%}" method="post"> 
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>&nbsp
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit">Login</button><br><br>
+    </form>
+    <p>Don't have an account? <a href="{%url 'register'%}">Sign up here</a></p> <!-- Replace "/signup/" with your signup URL -->
+</div>
+</center>
+{%endblock%}
