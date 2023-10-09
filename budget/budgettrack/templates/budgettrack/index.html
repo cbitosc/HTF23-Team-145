@@ -1,0 +1,335 @@
+{% extends "budgettrack/layout.html" %}
+
+{%block style%}
+/* Add flex container style */
+body {
+    background-color: #2b2e2b;
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; 
+}
+.account-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between; /* Adjust the alignment as needed */
+}
+
+/* Add style for individual account boxes */
+.account-box {
+    position: relative;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 5px;
+    width: calc(33.33% - 10px); /* Distribute the boxes evenly with some margin */
+    box-sizing: border-box;
+    text-align: center;
+}
+.account-box:hover .delete-button {
+    display: block;
+  }
+
+  .delete-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    display: none;
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+
+/* Add style for the "Add Account" box */
+.add-account-box {
+    border: 1px dashed #ccc;
+    padding: 10px;
+    margin: 5px;
+    width: calc(33.33% - 10px); /* Distribute the boxes evenly with some margin */
+    box-sizing: border-box;
+    text-align: center;
+    cursor: pointer;
+}
+
+/* Add style for the expenses section */
+.expenses-section {
+    margin-top: 20px;
+}
+
+/* Style for the expenses table */
+.expenses-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Style for expenses table headings */
+.expenses-table th {
+    background-color: #677269;
+    text-align: left;
+    padding: 8px;
+}
+
+/* Style for expenses table rows */
+.expenses-table tr:nth-child(even) {
+    background-color: #677269;
+}
+
+/* Style for expenses table data cells */
+.expenses-table td {
+    padding: 8px;
+}
+
+/* Style for the "Add Expense" row */
+.add-expense-row {
+    text-align: center;
+    cursor: pointer;
+}
+
+/* Style for the incomes section */
+.incomes-section {
+    margin-top: 20px;
+}
+
+/* Style for the incomes table */
+.incomes-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Style for incomes table headings */
+.incomes-table th {
+    background-color: #677269;
+    text-align: left;
+    padding: 8px;
+}
+
+/* Style for incomes table rows */
+.incomes-table tr:nth-child(even) {
+    background-color: #677269;
+}
+
+/* Style for incomes table data cells */
+.incomes-table td {
+    padding: 8px;
+}
+
+/* Style for the "Add Income" row */
+.add-income-row {
+    text-align: center;
+    cursor: pointer;
+}
+/* Inline CSS for the sidebar */
+.custom-sidebar {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    top: 0;
+    right: 0;
+    background-color: #333;
+    color: #fff;
+    transition: 0.3s;
+    overflow-y: auto;
+    padding-top: 60px;
+}
+
+.custom-sidebar.active {
+    width: 300px; /* Adjust the width as needed */
+}
+
+.custom-sidebar h2 {
+    padding: 20px 15px;
+}
+
+.custom-sidebar form {
+    padding: 20px 15px; /* Add padding to the form */
+}
+
+.custom-sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.custom-sidebar ul li {
+    padding: 10px 15px;
+    border-bottom: 1px solid #555;
+}
+
+.custom-sidebar ul li a {
+    color: #fff;
+    text-decoration: none;
+    display: block;
+}
+
+.custom-sidebar ul li a:hover {
+    background-color: #444;
+}
+
+/* Add Account, Expense, Income, and Transaction Boxes */
+.add-box {
+    background-color: #333;
+    color: #fff;
+    cursor: pointer;
+    padding: 10px 15px;
+    margin: 20px;
+    border-radius: 5px;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+/* Back Button */
+.custom-back-button {
+    background-color: #444;
+    color: #fff;
+    padding: 10px 15px;
+    text-align: center;
+    cursor: pointer;
+    margin-top: 20px;
+}
+tr {
+    position: relative;
+}
+
+tr .action-button {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+tr:hover .action-button {
+    display: block;
+    opacity: 0.7;
+}
+{%endblock%}
+
+{%block body%}
+<div class="container">
+    <h1>Welcome, {{ user.username }}!</h1>
+    
+    <h2>Your Accounts:</h2>
+
+    <div class="account-container">
+        {% for account in accounts%}        
+        <div class="account-box">
+            <a href="{%url 'delacc' acc=account.account_name%}"><button class="delete-button">Delete</button></a>
+            <h3>{{account.account_name}}</h3>
+            <p>Balance: {{account.calculate_current_balance}}</p>
+        </div>
+        {%endfor%}
+        <!-- Add Account Link Box -->
+        <div class="add-account-box" onclick="toggleCustomSidebar('account')">
+            <h3>Add Account</h3>
+        </div>
+    </div>
+
+    <!-- Expenses Section -->
+    <div class="expenses-section">
+        <h2>Expenses</h2>
+        <table class="expenses-table">
+            <tr>
+                <th>Name</th>
+                <th>Account</th>
+                <th>Amount</th>
+                <th>Notes</th>
+            </tr>
+            {%for expense in expenses%}
+            <tr>
+                <td>{{expense.name}}</td>
+                <td>{{expense.account.account_name}}</td>
+                <td>{{expense.amount}}</td>
+                <td>{{expense.note_or_description}}</td>
+                <td class="action-button"><a href="{%url 'del' type='expense' name=expense.name%}">delete</a></td>
+            </tr>
+            {%endfor%}
+            <!-- Add more expense rows as needed -->
+
+            <!-- Add Expense Row -->
+            <tr class="add-expense-row" onclick="toggleCustomSidebar('expense')">
+                <td colspan="4">Add Expense</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Incomes Section -->
+    <div class="incomes-section">
+        <h2>Incomes</h2>
+        <table class="incomes-table">
+            <tr>
+                <th>Name</th>
+                <th>Account</th>
+                <th>Amount</th>
+                <th>Notes</th>
+            </tr>
+            {%for income in incomes%}
+            <tr>
+                <td>{{income.name}}</td>
+                <td>{{income.account.account_name}}</td>
+                <td>{{income.amount}}</td>
+                <td>{{income.note_or_description}}</td>
+                <a href="{%url 'del' type='income' name=income.name%}"><td class="action-button">delete</td></a>
+            </tr>
+            {%endfor%}
+            <!-- Add more income rows as needed -->
+
+            <!-- Add Income Row -->
+            <tr class="add-income-row" onclick="toggleCustomSidebar('income')">
+                <td colspan="4">Add Income</td>
+            </tr>
+        </table>
+    </div>
+    <div class="incomes-section">
+        <h2>Transactions</h2>
+        <table class="incomes-table">
+            <tr>
+                <th>Name</th>
+                <th>From Account</th>
+                <th>To Account</th>
+                <th>Amount</th>
+                <th>Notes</th>
+            </tr>
+            {%for i in transactions%}
+            <tr>
+                <td>{{i.name}}</td>
+                <td>{{i.sender_account.account_name}}</td>
+                <td>{{i.receiver_account.account_name}}</td>
+                <td>{{i.amount}}</td>
+                <td>{{i.description}}</td>
+                <a href="{%url 'del' type='transfer' name=i.name%}"><td class="action-button">delete</td></a>
+            </tr>
+            {%endfor%}
+            <!-- Add more income rows as needed -->
+
+            <!-- Add Income Row -->
+            <tr class="add-income-row" onclick="toggleCustomSidebar('transaction')">
+                <td colspan="5">Add Transaction</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="custom-sidebar" id="customSidebar">
+        <a class="custom-back-button" href="#" onclick="toggleCustomSidebar()">Back</a>
+        <h2 id="sidebarTitle">Add New</h2>
+        <form action="{%url 'index'%}" method="post"> <!-- Replace "/add-entry/" with your actual URL -->
+            {% csrf_token %}
+            <input type="hidden" name="type" id="entryType" value=""> <!-- Hidden input field for 'type' -->
+            <div class="form-group" id="additionalFields"> <!-- Additional fields container -->
+                <!-- Fields specific to each type -->
+            </div>
+            <button type="submit">Add Entry</button>
+        </form>
+    </div>
+
+
+</div>
+
+{%endblock%}
+{% comment %} {% block script %}
+<script>
+
+</script>
+{% endblock script %} {% endcomment %}
